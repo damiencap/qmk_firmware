@@ -31,8 +31,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT(
                     KC_7,      KC_8,    KC_9,             KC_BSPC,
                     KC_4,      KC_5,    KC_6,             KC_ESC,
-                    KC_1,      KC_2,    KC_3,             KC_TAB,
-        KC_BTN1,    TT(1),     KC_0,    LSFT_T(KC_DOT),   KC_ENTER
+                    KC_1,      KC_2,    KC_3,             LALT(KC_TAB),
+        KC_MPLY,    TT(1),     KC_0,    LSFT_T(KC_DOT),   KC_ENTER
     ),
     /*
             SUB LAYER
@@ -87,18 +87,18 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
             case 0:
                 // main layer - move mouse right (CW) and left (CCW)
                 if (clockwise) {
-                    tap_code(KC_MS_R);
+                    tap_code(KC_AUDIO_VOL_DOWN);
                 } else {
-                    tap_code(KC_MS_L);
+                    tap_code(KC_AUDIO_VOL_UP);
                 }
                 break;
 
             default:
-                // other layers - =/+ (quals/plus) (CW) and -/_ (minus/underscore) (CCW)
+                // main layer - move mouse right (CW) and left (CCW)
                 if (clockwise) {
-                    tap_code(KC_EQL);
+                    tap_code(KC_MS_R);
                 } else {
-                    tap_code(KC_MINS);
+                    tap_code(KC_MS_L);
                 }
                 break;
         }
