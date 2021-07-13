@@ -14,6 +14,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
+#include "print.h"
+
+uint8_t knob_mode = 0;
+
+enum my_keycodes {
+  INC_KMODE
+};
+
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
@@ -30,8 +38,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     */
     [0] = LAYOUT(
                     KC_7,      KC_8,    KC_9,             KC_BSPC,
-                    KC_4,      KC_5,    KC_6,             KC_ESC,
-                    KC_1,      KC_2,    KC_3,             LALT(KC_TAB),
+                    KC_4,      KC_5,    KC_6,             LALT(KC_TAB),
+                    KC_1,      KC_2,    KC_3,             A(S(KC_TAB)),
         KC_MPLY,    TT(1),     KC_0,    LSFT_T(KC_DOT),   KC_ENTER
     ),
     /*
@@ -46,15 +54,34 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     |    LOCK     |         |         |         |    =    |
     \-----------------------------------------------------'
     */
+
+    
     [1] = LAYOUT(
                     _______,     _______,     _______,      RESET,
                     _______,     _______,     _______,      KC_KP_PLUS,
                     _______,     _______,     _______,      KC_KP_MINUS,
-        KC_LOCK,    _______,     _______,     _______,      KC_EQL
+        KC_BTN1,    _______,     _______,     _______,      INC_KMODE
     ),
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case INC_KMODE: {
+            if (record->event.pressed) {
+                if (knob_mode < 3) {
+                    knob_mode++;
+                }
+                else {
+                    knob_mode = 0;
+                }
+
+                uprintf("knob mode %u\n", knob_mode);
+            }
+            return false;
+        }
+        default:
+        return true;
+    }
     // If console is enabled, it will print the matrix position and status of each key pressed
 /*
 #ifdef CONSOLE_ENABLE
@@ -96,9 +123,19 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
             default:
                 // main layer - move mouse right (CW) and left (CCW)
                 if (clockwise) {
-                    tap_code(KC_MS_R);
+                    if (knob_mode == 0 || knob_mode == 1) {
+                            tap_code(KC_MS_R);
+                        }
+                        else {
+                            tap_code(KC_MS_D);
+                        }
                 } else {
-                    tap_code(KC_MS_L);
+                    if (knob_mode == 0 || knob_mode == 1) {
+                        tap_code(KC_MS_L);
+                    }
+                    else {
+                        tap_code(KC_MS_U);
+                    }
                 }
                 break;
         }
